@@ -1,2 +1,37 @@
 #!/bin/bash
-find . -type d ! -path . -print | wc -1
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+
+int count_directories(char *path) {
+    int count = 0;
+    DIR *dir = opendir(path);
+    struct dirent *entry;
+
+    if (dir == NULL) {
+        perror("opendir");
+        return -1;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        char *name = entry->d_name;
+        if (name[0] == '.') continue; // ignore hidden files/directories
+        if (entry->d_type == DT_DIR) {
+            char *subpath = malloc(strlen(path) + strlen(name) + 2);
+            sprintf(subpath, "%s/%s", path, name);
+            count += 1 + count_directories(subpath); // count sub-directories recursively
+            free(subpath);
+        }
+    }
+
+    closedir(dir);
+    return count;
+}
+
+int main() {
+    int count = count_directories(".");
+    printf("%d\n", count);
+    return 0;
+}
+

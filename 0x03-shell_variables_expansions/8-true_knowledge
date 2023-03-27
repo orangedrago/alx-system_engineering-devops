@@ -1,2 +1,3 @@
 #!/bin/bash
-echo $((128 + $TRUSKNOWLEDGE))
+cat /proc/meminfo | grep MemTotal | read _ memtotal _; echo $memtotal
+cat /proc/meminfo | grep MemFree | read _ memfree _; echo $memfree
